@@ -20,7 +20,7 @@
 		<dbunit.version>2.2</dbunit.version>
 	</properties> 
 
-	<dependencies>
+	<dependencies>	
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
