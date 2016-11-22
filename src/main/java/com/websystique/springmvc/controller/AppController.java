@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.apache.log4j.*;
 
 import com.websystique.springmvc.model.Employee;
 import com.websystique.springmvc.service.EmployeeService;
@@ -27,13 +28,20 @@ public class AppController {
 	
 	@Autowired
 	MessageSource messageSource;
+	
+	private static Logger log=Logger.getLogger(AppController.class);
 
 	/*
 	 * This method will list all existing employees.
 	 */
 	@RequestMapping(value = { "/", "/list" }, method = RequestMethod.GET)
 	public String listEmployees(ModelMap model) {
-
+		log.debug("list");
+		
+		log.debug(Locale.getDefault().getCountry());
+		log.debug(Locale.getDefault().getLanguage());
+		
+		
 		List<Employee> employees = service.findAllEmployees();
 		model.addAttribute("employees", employees);
 		return "allemployees";
@@ -44,6 +52,8 @@ public class AppController {
 	 */
 	@RequestMapping(value = { "/new" }, method = RequestMethod.GET)
 	public String newEmployee(ModelMap model) {
+		log.debug("new");
+		
 		Employee employee = new Employee();
 		model.addAttribute("employee", employee);
 		model.addAttribute("edit", false);
@@ -57,6 +67,8 @@ public class AppController {
 	@RequestMapping(value = { "/new" }, method = RequestMethod.POST)
 	public String saveEmployee(@Valid Employee employee, BindingResult result,
 			ModelMap model) {
+		log.debug("saveEmployee");
+		
 
 		if (result.hasErrors()) {
 			return "registration";
@@ -71,9 +83,9 @@ public class AppController {
 		 * 
 		 */
 		if(!service.isEmployeeSsnUnique(employee.getId(), employee.getSsn())){
-			FieldError ssnError =new FieldError("employee","ssn",messageSource.getMessage("non.unique.ssn", new String[]{employee.getSsn()}, Locale.getDefault()));
+			//FieldError ssnError =new FieldError("employee","ssn",messageSource.getMessage("non.unique.ssn", new String[]{employee.getSsn()}, Locale.getDefault()));
 			//FieldError ssnError =new FieldError("employee","ssn","不是唯一~!");
-			//FieldError ssnError =new FieldError("employee","ssn",messageSource.getMessage("non.unique.ssn", new String[]{"得到的"}, Locale.SIMPLIFIED_CHINESE));
+			FieldError ssnError =new FieldError("employee","ssn",messageSource.getMessage("non.unique.ssn", new String[]{employee.getSsn()}, Locale.JAPAN));
 			result.addError(ssnError);
 			return "registration";
 		}
@@ -90,6 +102,8 @@ public class AppController {
 	 */
 	@RequestMapping(value = { "/edit-{ssn}-employee" }, method = RequestMethod.GET)
 	public String editEmployee(@PathVariable String ssn, ModelMap model) {
+		log.debug("editEmployee");
+		
 		Employee employee = service.findEmployeeBySsn(ssn);
 		model.addAttribute("employee", employee);
 		model.addAttribute("edit", true);
@@ -103,6 +117,8 @@ public class AppController {
 	@RequestMapping(value = { "/edit-{ssn}-employee" }, method = RequestMethod.POST)
 	public String updateEmployee(@Valid Employee employee, BindingResult result,
 			ModelMap model, @PathVariable String ssn) {
+		
+		log.debug("updateEmployee");
 
 		if (result.hasErrors()) {
 			return "registration";
@@ -127,6 +143,8 @@ public class AppController {
 	 */
 	@RequestMapping(value = { "/delete-{ssn}-employee" }, method = RequestMethod.GET)
 	public String deleteEmployee(@PathVariable String ssn) {
+		log.debug("deleteEmployee");
+		
 		service.deleteEmployeeBySsn(ssn);
 		return "redirect:/list";
 	}
